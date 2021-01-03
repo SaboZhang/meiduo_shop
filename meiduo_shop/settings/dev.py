@@ -217,14 +217,14 @@ LOGGING = {
 LOGIN_URL = '/user/login/'
 
 # QQ授权登录配置信息 redirect_uri
-QQ_APP_ID = '101920741'
-QQ_APP_KEY = '8e67ae1b6894fdea9ca311da47eccffa'
+QQ_APP_ID = ''
+QQ_APP_KEY = ''
 QQ_REDIRECT_URI = 'http://blog.taosugar.com/oauth_callback'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 指定邮件后端
 EMAIL_HOST = 'smtp.yeah.net'  # 发邮件主机
 EMAIL_PORT = 465  # 发邮件端口
-EMAIL_HOST_USER = 'zhang521629@yeah.net'  # 授权的邮箱
+EMAIL_HOST_USER = ''  # 授权的邮箱
 EMAIL_HOST_PASSWORD = 'IZWLUMFSMFNQHSVV'  # 邮箱授权时获得的密码，非注册登录密码
 EMAIL_FROM = '美多商城<zhang521629@yeah.net>'  # 发件人抬头
 EMAIL_USE_SSL = True
