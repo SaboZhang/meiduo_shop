@@ -3,7 +3,7 @@
 """
 @Author: 张涛
 @Date: 2020-12-20 17:57:03
-@LastEditTime: 2020-12-23 23:15:02
+@LastEditTime: 2021-01-10 13:51:03
 @LastEditors: 张涛
 @Description: QQ授权登录
 @FilePath: /meiduo_shop/apps/oauth/views.py
@@ -46,6 +46,39 @@ class QQOAuthUrlView(View):
             {'code': RETCODE.OK, 'errmsg': 'OK', 'login_url': login_url})
 
 
+def get_user_info(access_token, oauth_consumer_key, openid):
+    """
+
+    Args:
+        access_token: access_token
+        oauth_consumer_key: 申请QQ登录成功后，分配给应用的appid
+        openid:openid
+
+    Returns:
+
+    """
+    data_dict = {
+        'access_token': access_token,
+        'oauth_consumer_key': oauth_consumer_key,
+        'openid': openid
+    }
+    # 构建url
+    user_info_url = 'https://graph.qq.com/user/get_user_info?' + urlencode(data_dict)
+    # 发送请求
+    try:
+        response = requests.get(user_info_url)
+
+        # 提取数据
+        data = response.text
+
+        # 转化为字典
+        data_dict = json.loads(data)
+    except Exception as e:
+        logger.error(e)
+        return http.HttpResponseBadRequest
+    return data_dict
+
+
 class QQAuthLoginView(View):
     """处理QQ授权登录回调"""
 
@@ -66,7 +99,7 @@ class QQAuthLoginView(View):
             logger.error(e)
             return http.HttpResponseServerError('OAuth2.0认证失败')
         # 查询用户是否绑定
-        self.get_user_info(access_token, settings.QQ_APP_ID, openid)
+        get_user_info(access_token, settings.QQ_APP_ID, openid)
         try:
             oauth_user = OauthQQUser.objects.get(openid=openid)
         except OauthQQUser.DoesNotExist:
@@ -138,26 +171,3 @@ class QQAuthLoginView(View):
         response = redirect(next)
         response.set_cookie('username', qq_user.username, max_age=3600 * 24 * 7)
         return response
-
-    def get_user_info(self, access_token, oauth_consumer_key, openid):
-        """获取用户QQ信息"""
-        data_dict = {
-            'access_token': access_token,
-            'oauth_consumer_key': oauth_consumer_key,
-            'openid': openid
-        }
-        # 构建url
-        user_info_url = 'https://graph.qq.com/user/get_user_info?' + urlencode(data_dict)
-        # 发送请求
-        try:
-            response = requests.get(user_info_url)
-
-            # 提取数据
-            data = response.text
-
-            # 转化为字典
-            data_dict = json.loads(data)
-        except Exception as e:
-            logger.error(e)
-            return http.HttpResponseBadRequest
-        return data_dict
